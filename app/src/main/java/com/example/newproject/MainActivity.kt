@@ -9,7 +9,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,8 +34,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -47,10 +53,32 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             NewProjectTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    DisappearingImageGrid(
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color.Transparent
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color(0xFFF8BBD0), // Light Pink
+                                        Color(0xFFFFF59D), // Light Yellow
+                                        Color(0xFFCE93D8)  // Light Purple
+                                    )
+                                )
+                            )
+                    ) {
+                        Scaffold(
+                            modifier = Modifier.fillMaxSize(),
+
+                        ) { innerPadding ->
+                            DisappearingImageGrid(
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -75,27 +103,31 @@ fun DisappearingImageGrid(modifier: Modifier = Modifier) {
 
     LaunchedEffect(Unit) {
         while (true) {
-            delay(2000) // Wait for 2 seconds
+            delay(2000)
             imagesVisible = false
-            delay(500) // Stay invisible for 0.5 seconds
+            delay(500)
             imagesVisible = true
         }
     }
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
+    Box(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) { 
-        items(images) { imageItem ->
-            ImageCard(
-                imageRes = imageItem.imageRes,
-                description = imageItem.description,
-                imageVisible = imagesVisible, // Pass the visibility state
-                modifier = Modifier.fillMaxWidth()
-            )
+        contentAlignment = Alignment.Center
+    ) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) { 
+            items(images) { imageItem ->
+                ImageCard(
+                    imageRes = imageItem.imageRes,
+                    description = imageItem.description,
+                    imageVisible = imagesVisible,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }
@@ -104,7 +136,7 @@ fun DisappearingImageGrid(modifier: Modifier = Modifier) {
 fun ImageCard(
     @DrawableRes imageRes: Int,
     description: String,
-    imageVisible: Boolean, // New parameter to control visibility
+    imageVisible: Boolean,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -113,7 +145,8 @@ fun ImageCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AnimatedVisibility(
                 visible = imageVisible,
@@ -131,7 +164,6 @@ fun ImageCard(
                 )
             }
             if (!imageVisible) {
-                // A spacer to maintain the card's size when the image is hidden
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()

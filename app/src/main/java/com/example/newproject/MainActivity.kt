@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -99,14 +99,16 @@ fun DisappearingImageGrid(modifier: Modifier = Modifier) {
         ImageItem(R.drawable.flower, "Image 4")
     )
 
-    var imagesVisible by remember { mutableStateOf(true) }
+    var hiddenCardIndex by remember { mutableStateOf(-1) }
 
     LaunchedEffect(Unit) {
+        var currentIndex = 0
         while (true) {
-            delay(2000)
-            imagesVisible = false
-            delay(500)
-            imagesVisible = true
+            delay(2000) 
+            hiddenCardIndex = currentIndex
+            delay(500) 
+            hiddenCardIndex = -1
+            currentIndex = (currentIndex + 1) % images.size
         }
     }
 
@@ -120,11 +122,11 @@ fun DisappearingImageGrid(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) { 
-            items(images) { imageItem ->
+            itemsIndexed(images) { index, imageItem ->
                 ImageCard(
                     imageRes = imageItem.imageRes,
                     description = imageItem.description,
-                    imageVisible = imagesVisible,
+                    imageVisible = index != hiddenCardIndex, 
                     modifier = Modifier.fillMaxWidth()
                 )
             }
